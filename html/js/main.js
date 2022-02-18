@@ -3,15 +3,21 @@
 var QBRadialMenu = null;
 
 $(document).ready(function(){
+
     window.addEventListener('message', function(event){
-        switch (event.data.action) {
-            case "ui":
-                if (event.data.radial) {
-                    createMenu(event.data.items)
-                    QBRadialMenu.open();
-                } else {
-                    QBRadialMenu.close();
-                }
+        var eventData = event.data;
+
+        if (eventData.action == "ui") {
+            if (eventData.radial) {
+                createMenu(eventData.items)
+                QBRadialMenu.open();
+            } else {
+                QBRadialMenu.close();
+            }
+        }
+
+        if (eventData.action == "setPlayers") {
+            createMenu(eventData.items)
         }
     });
 });
@@ -26,7 +32,7 @@ function createMenu(items) {
                 QBRadialMenu.close();
             }
             
-            if (item.items == null && item.shouldClose != null) {
+            if (item.event !== null) {
                 $.post('https://qb-radialmenu/selectItem', JSON.stringify({
                     itemData: item
                 }))

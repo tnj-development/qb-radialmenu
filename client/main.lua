@@ -1,21 +1,43 @@
-QBCore = exports['qb-core']:GetCoreObject()
-PlayerData = QBCore.Functions.GetPlayerData() -- Setting this for when you restart the resource in game
+local QBCore = exports['qb-core']:GetCoreObject()
 local inRadialMenu = false
+local PlayerData = QBCore.Functions.GetPlayerData()
 
--- Functions
+RegisterCommand('radialmenu', function()
+    if not PlayerData.metadata["isdead"] and not PlayerData.metadata["inlaststand"] and not PlayerData.metadata["ishandcuffed"] and not IsPauseMenuActive() and not inRadialMenu then
+        openRadial(true)
+        SetCursorLocation(0.5, 0.5)
+    end
+end)
 
-local function setupSubItems()
+RegisterKeyMapping('radialmenu', Lang:t("general.command_description"), 'keyboard', 'F1')
+
+-- Sets the metadata when the player spawns
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
+    PlayerData = QBCore.Functions.GetPlayerData()
+end)
+
+-- Sets the playerdata to an empty table when the player has quit or did /logout
+RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
+    PlayerData = {}
+end)
+
+-- This will update all the PlayerData that doesn't get updated with a specific event other than this like the metadata
+RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
+    PlayerData = val
+end)
+
+function setupSubItems()
     if PlayerData.metadata["isdead"] then
         if PlayerData.job.name == "police" or PlayerData.job.name == "ambulance" then
-            if not Config.MenuItems[4] then
-                Config.MenuItems[4] = {
+            if not Config.MenuItems[6] then
+                Config.MenuItems[6] = {
                     id = 'jobinteractions',
                     title = 'Work',
                     icon = 'briefcase',
                     items = {}
                 }
             end
-            Config.MenuItems[4].items = {
+            Config.MenuItems[6].items = {
                 [1] = {
                     id = 'emergencybutton2',
                     title = Lang:t("options.emergency_button"),
@@ -27,32 +49,32 @@ local function setupSubItems()
             }
         else
             if Config.JobInteractions[PlayerData.job.name] and next(Config.JobInteractions[PlayerData.job.name]) then
-                if not Config.MenuItems[4] then
-                    Config.MenuItems[4] = {
+                if not Config.MenuItems[6] then
+                    Config.MenuItems[6] = {
                         id = 'jobinteractions',
                         title = 'Work',
                         icon = 'briefcase',
                         items = {}
                     }
                 end
-                Config.MenuItems[4].items = Config.JobInteractions[PlayerData.job.name]
+                Config.MenuItems[6].items = Config.JobInteractions[PlayerData.job.name]
             else
-                Config.MenuItems[4] = nil
+                Config.MenuItems[6] = nil
             end
         end
     else
         if Config.JobInteractions[PlayerData.job.name] and next(Config.JobInteractions[PlayerData.job.name]) then
-            if not Config.MenuItems[4] then
-                Config.MenuItems[4] = {
+            if not Config.MenuItems[6] then
+                Config.MenuItems[6] = {
                     id = 'jobinteractions',
                     title = 'Work',
                     icon = 'briefcase',
                     items = {}
                 }
             end
-            Config.MenuItems[4].items = Config.JobInteractions[PlayerData.job.name]
+            Config.MenuItems[6].items = Config.JobInteractions[PlayerData.job.name]
         else
-            Config.MenuItems[4] = nil
+            Config.MenuItems[6] = nil
         end
     end
 
@@ -145,65 +167,23 @@ local function setupSubItems()
     end
 end
 
-local function deepcopy(orig) -- modified the deep copy function from http://lua-users.org/wiki/CopyTable
-    local orig_type = type(orig)
-    local copy
-    if orig_type == 'table' then
-        if not orig.canOpen or orig.canOpen() then
-            local toRemove = {}
-            copy = {}
-            for orig_key, orig_value in next, orig, nil do
-                if type(orig_value) == 'table' then
-                    if not orig_value.canOpen or orig_value.canOpen() then
-                        copy[deepcopy(orig_key)] = deepcopy(orig_value)
-                    else
-                        toRemove[orig_key] = true
-                    end
-                else
-                    copy[deepcopy(orig_key)] = deepcopy(orig_value)
-                end
-            end
-            for i=1, #toRemove do table.remove(copy, i) --[[ Using this to make sure all indexes get re-indexed and no empty spaces are in the radialmenu ]] end
-            if copy and next(copy) then setmetatable(copy, deepcopy(getmetatable(orig))) end
-        end
-    elseif orig_type ~= 'function' then
-        copy = orig
-    end
-    return copy
-end
-
-local function selectOption(t, t2)
-    for k, v in pairs(t) do
-        if v.items then
-            local found, hasAction = selectOption(v.items, t2)
-            if found then return true, hasAction end
-        else
-            if v.id == t2.id and ((v.event and v.event == t2.event) or v.action) and (not v.canOpen or v.canOpen()) then
-                return true, v.action
-            end
-        end
-    end
-    return false
-end
-
-local function setRadialState(bool, sendMessage)
-    local items
-    if bool then
-        setupSubItems()
-        items = deepcopy(Config.MenuItems)
-    end
+function openRadial(bool)
+    setupSubItems()
     SetNuiFocus(bool, bool)
-    if sendMessage then
-        SendNUIMessage({
-            action = "ui",
-            radial = bool,
-            items = items
-        })
-    end
+    SendNUIMessage({
+        action = "ui",
+        radial = bool,
+        items = Config.MenuItems
+    })
     inRadialMenu = bool
 end
 
-local function getNearestVeh()
+function closeRadial(bool)
+    SetNuiFocus(false, false)
+    inRadialMenu = bool
+end
+
+function getNearestVeh()
     local pos = GetEntityCoords(PlayerPedId())
     local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
     local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
@@ -211,32 +191,36 @@ local function getNearestVeh()
     return vehicleHandle
 end
 
--- Command
-
-RegisterCommand('radialmenu', function()
-    if not PlayerData.metadata["isdead"] and not PlayerData.metadata["inlaststand"] and not PlayerData.metadata["ishandcuffed"] and not IsPauseMenuActive() and not inRadialMenu then
-        setRadialState(true, true)
-        SetCursorLocation(0.5, 0.5)
+local function checkOption(t, t2)
+    for k, v in pairs(t) do
+        if v.items then
+            if checkOption(v.items, t2) then return true end
+        else
+            if v.event == t2.event then
+                return true
+            end
+        end
     end
+    return false
+end
+
+RegisterNUICallback('closeRadial', function()
+    closeRadial(false)
 end)
 
-RegisterKeyMapping('radialmenu', Lang:t("general.command_description"), 'keyboard', 'F1')
-
--- Events
-
--- Sets the metadata when the player spawns
-RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
-    PlayerData = QBCore.Functions.GetPlayerData()
-end)
-
--- Sets the playerdata to an empty table when the player has quit or did /logout
-RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
-    PlayerData = {}
-end)
-
--- This will update all the PlayerData that doesn't get updated with a specific event other than this like the metadata
-RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
-    PlayerData = val
+RegisterNUICallback('selectItem', function(data)
+    local itemData = data.itemData
+    if itemData and checkOption(Config.MenuItems, itemData) then
+        if itemData.type == 'client' then
+            TriggerEvent(itemData.event, itemData)
+        elseif itemData.type == 'server' then
+            TriggerServerEvent(itemData.event, itemData)
+        elseif itemData.type == 'command' then
+            ExecuteCommand(itemData.event)
+        elseif itemData.type == 'qbcommand' then
+            TriggerServerEvent('QBCore:CallCommand', itemData.event, itemData)
+        end
+    end
 end)
 
 RegisterNetEvent('qb-radialmenu:client:noPlayers', function()
@@ -339,26 +323,17 @@ RegisterNetEvent('qb-radialmenu:client:ChangeSeat', function(data)
     end
 end)
 
--- NUI Callbacks
-
-RegisterNUICallback('closeRadial', function()
-    setRadialState(false, false)
-end)
-
-RegisterNUICallback('selectItem', function(data)
-    local itemData = data.itemData
-    local found, action = selectOption(Config.MenuItems, itemData)
-    if itemData and found then
-        if action then
-            action(itemData)
-        elseif itemData.type == 'client' then
-            TriggerEvent(itemData.event, itemData)
-        elseif itemData.type == 'server' then
-            TriggerServerEvent(itemData.event, itemData)
-        elseif itemData.type == 'command' then
-            ExecuteCommand(itemData.event)
-        elseif itemData.type == 'qbcommand' then
-            TriggerServerEvent('QBCore:CallCommand', itemData.event, itemData)
-        end
-    end
-end)
+function DrawText3Ds(x, y, z, text)
+	SetTextScale(0.35, 0.35)
+    SetTextFont(4)
+    SetTextProportional(1)
+    SetTextColour(255, 255, 255, 215)
+    SetTextEntry("STRING")
+    SetTextCentre(true)
+    AddTextComponentString(text)
+    SetDrawOrigin(x,y,z, 0)
+    DrawText(0.0, 0.0)
+    local factor = (string.len(text)) / 370
+    DrawRect(0.0, 0.0+0.0125, 0.017+ factor, 0.03, 0, 0, 0, 75)
+    ClearDrawOrigin()
+end

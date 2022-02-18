@@ -1,35 +1,18 @@
-local isAttached = false
-local stretcherObject = nil
-local isLayingOnBed = false
-local detachKeys = {157, 158, 160, 164, 165, 73, 36}
+local QBCore = exports['qb-core']:GetCoreObject()
+local IsAttached = false
+local StretcherObject = nil
+local IsLayingOnBed = false
 
 -- Add your vehicles here that will allow Ambulance to get a stretcher out.
-local allowedStretcherVehicles = {
+local AllowedStretcherVehicles = {
     "ambulance",
 }
 
--- Functions
-
-local function DrawText3Ds(x, y, z, text)
-	SetTextScale(0.35, 0.35)
-    SetTextFont(4)
-    SetTextProportional(1)
-    SetTextColour(255, 255, 255, 215)
-    SetTextEntry("STRING")
-    SetTextCentre(true)
-    AddTextComponentString(text)
-    SetDrawOrigin(x,y,z, 0)
-    DrawText(0.0, 0.0)
-    local factor = (string.len(text)) / 370
-    DrawRect(0.0, 0.0+0.0125, 0.017+ factor, 0.03, 0, 0, 0, 75)
-    ClearDrawOrigin()
-end
-
-local function checkForVehicles()
+function CheckForVehicles()
     local PlayerPed = PlayerPedId()
     local PlayerPos = GetEntityCoords(PlayerPed)
     local veh = 0
-    for k, v in pairs(allowedStretcherVehicles) do
+    for k, v in pairs(AllowedStretcherVehicles) do
         veh = GetClosestVehicle(PlayerPos.x, PlayerPos.y, PlayerPos.z, 7.5, GetHashKey(v), 70)
         if veh ~= 0 then
             break
@@ -38,129 +21,21 @@ local function checkForVehicles()
     return veh
 end
 
-local function setClosestStretcher()
-    local ped = PlayerPedId()
-    local coords = GetEntityCoords(ped)
-    local object = GetClosestObjectOfType(coords.x, coords.y, coords.z, 10.0, `prop_ld_binbag_01`, false, false, false)
-    if object ~= 0 then
-        stretcherObject = object
-    end
-end
-
-local function loadAnim(dict)
-    RequestAnimDict(dict)
-    while not HasAnimDictLoaded(dict) do
-        Wait(0)
-    end
-end
-
-local function GetClosestPlayer()
-    local closestPlayers = QBCore.Functions.GetPlayersFromCoords()
-    local closestDistance = -1
-    local closestPlayer = -1
-    local coords = GetEntityCoords(PlayerPedId())
-    local player = PlayerId()
-    for i=1, #closestPlayers, 1 do
-        if closestPlayers[i] ~= player then
-            local pos = GetEntityCoords(GetPlayerPed(closestPlayers[i]))
-            local distance = #(pos - coords)
-            if closestDistance == -1 or closestDistance > distance then
-                closestPlayer = closestPlayers[i]
-                closestDistance = distance
-            end
-        end
-	end
-	return closestPlayer, closestDistance
-end
-
-local function LayOnStretcher()
-    local inBedDicts = "anim@gangops@morgue@table@"
-    local inBedAnims = "ko_front"
-    local ped = PlayerPedId()
-    local coords = GetEntityCoords(ped)
-    local player, distance = GetClosestPlayer()
-    if player == -1 then
-        loadAnim(inBedDicts)
-        if stretcherObject and #(coords - GetEntityCoords(stretcherObject)) <= 3.0 then
-            TaskPlayAnim(PlayerPedId(), inBedDicts, inBedAnims, 8.0, 8.0, -1, 69, 1, false, false, false)
-            AttachEntityToEntity(ped, stretcherObject, 0, 0, 0.0, 1.0, 0.0, 0.0, 180.0, 0.0, false, false, false, false, 2, true)
-            isLayingOnBed = true
-        end
-    else
-        if distance < 2.0 then
-            TriggerServerEvent('qb-radialmenu:Stretcher:BusyCheck', GetPlayerServerId(player), "lay")
-        else
-            loadAnim(inBedDicts)
-            if stretcherObject and #(coords - GetEntityCoords(stretcherObject)) <= 3.0 then
-                TaskPlayAnim(PlayerPedId(), inBedDicts, inBedAnims, 8.0, 8.0, -1, 69, 1, false, false, false)
-                AttachEntityToEntity(ped, stretcherObject, 0, 0, 0.0, 1.6, 0.0, 0.0, 360.0, 0.0, false, false, false, false, 2, true)
-                isLayingOnBed = true
-            end
-        end
-    end
-end
-
-local function getOffStretcher()
-    local ped = PlayerPedId()
-    local coords = GetOffsetFromEntityInWorldCoords(stretcherObject, 0.85, 0.0, 0)
-    ClearPedTasks(ped)
-    DetachEntity(ped, false, true)
-    SetEntityCoords(ped, coords.x, coords.y, coords.z)
-    isLayingOnBed = false
-end
-
-local function attachToStretcher()
-    local ped = PlayerPedId()
-    local closestPlayer, distance = GetClosestPlayer()
-    if stretcherObject then
-        if closestPlayer == -1 then
-            NetworkRequestControlOfEntity(stretcherObject)
-            loadAnim("anim@heists@box_carry@")
-            TaskPlayAnim(ped, 'anim@heists@box_carry@', 'idle', 8.0, 8.0, -1, 50, 0, false, false, false)
-            SetTimeout(150, function()
-                AttachEntityToEntity(stretcherObject, ped, GetPedBoneIndex(ped, 28422), 0.0, -1.0, -0.50, 195.0, 180.0, 180.0, 90.0, false, false, true, false, 2, true)
-            end)
-            FreezeEntityPosition(stretcherObject, false)
-        else
-            if distance < 2.0 then
-                TriggerServerEvent('qb-radialmenu:Stretcher:BusyCheck', GetPlayerServerId(closestPlayer), "attach")
-            else
-                NetworkRequestControlOfEntity(stretcherObject)
-                loadAnim("anim@heists@box_carry@")
-                TaskPlayAnim(ped, 'anim@heists@box_carry@', 'idle', 8.0, 8.0, -1, 50, 0, false, false, false)
-                SetTimeout(150, function()
-                    AttachEntityToEntity(stretcherObject, ped, GetPedBoneIndex(ped, 28422), 0.0, -1.0, -1.0, 195.0, 180.0, 180.0, 90.0, false, false, true, false, 2, true)
-                end)
-                FreezeEntityPosition(stretcherObject, false)
-            end
-        end
-    end
-end
-
-local function detachStretcher()
-    DetachEntity(stretcherObject, false, true)
-    ClearPedTasksImmediately(PlayerPedId())
-    isAttached = false
-end
-
--- Events
-
 RegisterNetEvent('qb-radialmenu:client:TakeStretcher', function()
-    local vehicle = checkForVehicles()
-    if vehicle ~= 0 then
-        RequestModel("prop_ld_binbag_01")
-        while not HasModelLoaded("prop_ld_binbag_01") do
-            Wait(0)
-        end
-        local obj = CreateObject(`prop_ld_binbag_01`, GetEntityCoords(PlayerPedId()), true)
-        if obj ~= 0 then
-            SetEntityRotation(obj, 0.0, 0.0, GetEntityHeading(vehicle), false, false)
-            FreezeEntityPosition(obj, true)
-            PlaceObjectOnGroundProperly(obj)
-            stretcherObject = obj
+    local PlayerPed = PlayerPedId()
+    local Vehicle = CheckForVehicles()
+    if Vehicle ~= 0 then
+        local VehCoords = GetOffsetFromEntityInWorldCoords(PlayerPed, 0, 0.75, 0)
+        LoadModel("prop_ld_binbag_01")
+        local Obj = CreateObject(`prop_ld_binbag_01`, GetEntityCoords(PlayerPed), true)
+        if Obj ~= nil or Obj ~= 0 then
+            SetEntityRotation(Obj, 0.0, 0.0, GetEntityHeading(Vehicle), false, false)
+            FreezeEntityPosition(Obj, true)
+            PlaceObjectOnGroundProperly(Obj)
+            StretcherObject = Obj
             SetTimeout(200, function()
-                attachToStretcher()
-                isAttached = true
+                AttachToStretcher()
+                IsAttached = true
             end)
         else
             QBCore.Functions.Notify(Lang:t("error.obj_not_found"), 'error')
@@ -171,19 +46,20 @@ RegisterNetEvent('qb-radialmenu:client:TakeStretcher', function()
 end)
 
 RegisterNetEvent('qb-radialmenu:client:RemoveStretcher', function()
-    local ped = PlayerPedId()
-    local coords = GetOffsetFromEntityInWorldCoords(ped, 0, 1.5, 0)
-    if stretcherObject then
-        local bCoords = GetEntityCoords(stretcherObject)
-        if #(coords - bCoords) < 3.0 then
-            if DoesEntityExist(stretcherObject) then
-                DeleteEntity(stretcherObject)
-                ClearPedTasks(ped)
-                DetachEntity(ped, false, true)
-                TriggerServerEvent('qb-radialmenu:server:RemoveStretcher', coords, stretcherObject)
-                isAttached = false
-                stretcherObject = nil
-                isLayingOnBed = false
+    local PlayerPed = PlayerPedId()
+    local PlayerPos = GetOffsetFromEntityInWorldCoords(PlayerPed, 0, 1.5, 0)
+    if StretcherObject ~= nil then
+        local BCoords = GetEntityCoords(StretcherObject)
+        local Dist = #(PlayerPos - BCoords)
+        if Dist < 3.0 then
+            if DoesEntityExist(StretcherObject) then
+                DeleteEntity(StretcherObject)
+                ClearPedTasks(PlayerPed)
+                DetachEntity(PlayerPed, false, true)
+                TriggerServerEvent('qb-radialmenu:server:RemoveStretcher', PlayerPos, StretcherObject)
+                IsAttached = false
+                StretcherObject = nil
+                IsLayingOnBed = false
             end
         else
             QBCore.Functions.Notify(Lang:t("error.far_away"), 'error')
@@ -191,186 +67,314 @@ RegisterNetEvent('qb-radialmenu:client:RemoveStretcher', function()
     end
 end)
 
-RegisterNetEvent('qb-radialmenu:client:RemoveStretcherFromArea', function(playerPos, bObject)
-    local ped = PlayerPedId()
-    local pos = GetEntityCoords(ped)
-    if pos ~= playerPos then
-        if stretcherObject then
-            if stretcherObject == bObject then
-                if #(pos - playerPos) < 10 then
-                    if IsEntityPlayingAnim(ped, 'anim@heists@box_carry@', 'idle', false) then
-                        detachStretcher()
-                    end
-                    if IsEntityPlayingAnim(ped, "anim@gangops@morgue@table@", "ko_front", false) then
-                        local coords = GetOffsetFromEntityInWorldCoords(ped, 0.85, 0.0, 0)
-                        ClearPedTasks(ped)
-                        DetachEntity(ped, false, true)
-                        SetEntityCoords(ped, coords.x, coords.y, coords.z)
-                        isLayingOnBed = false
-                    end
-                end
-            end
-        end
+function SetClosestStretcher()
+    local Ped = PlayerPedId()
+    local c = GetEntityCoords(Ped)
+    local Object = GetClosestObjectOfType(c.x, c.y, c.z, 10.0, `prop_ld_binbag_01`, false, false, false)
+    if Object ~= 0 then
+        StretcherObject = Object
     end
-end)
-
-RegisterNetEvent('qb-radialmenu:Stretcher:client:BusyCheck', function(otherId, type)
-    local ped = PlayerPedId()
-    if type == "lay" then
-        loadAnim("anim@gangops@morgue@table@")
-        IsEntityPlayingAnim(entity, animDict, animName, p4)
-        if IsEntityPlayingAnim(ped, "anim@gangops@morgue@table@", "ko_front", 3) then
-            TriggerServerEvent('qb-radialmenu:server:BusyResult', true, otherId, type)
-        else
-            TriggerServerEvent('qb-radialmenu:server:BusyResult', false, otherId, type)
-        end
-    else
-        loadAnim('anim@heists@box_carry@')
-        if IsEntityPlayingAnim(ped, 'anim@heists@box_carry@', 'idle', 3) then
-            TriggerServerEvent('qb-radialmenu:server:BusyResult', true, otherId, type)
-        else
-            TriggerServerEvent('qb-radialmenu:server:BusyResult', false, otherId, type)
-        end
-    end
-end)
-
-RegisterNetEvent('qb-radialmenu:client:Result', function(isBusy, type)
-    local ped = PlayerPedId()
-    local inBedDicts = "anim@gangops@morgue@table@"
-    local inBedAnims = "ko_front"
-    if type == "lay" then
-        if not isBusy then
-            NetworkRequestControlOfEntity(stretcherObject)
-            loadAnim(inBedDicts)
-            TaskPlayAnim(ped, inBedDicts, inBedAnims, 8.0, 8.0, -1, 69, 1, false, false, false)
-            AttachEntityToEntity(ped, stretcherObject, 0, 0, 0.0, 1.6, 0.0, 0.0, 360.0, 0.0, false, false, false, false, 2, true)
-            isLayingOnBed = true
-        else
-            QBCore.Functions.Notify(Lang:t("error.stretcher_in_use"), "error")
-            isLayingOnBed = false
-        end
-    else
-        if not isBusy then
-            NetworkRequestControlOfEntity(stretcherObject)
-            loadAnim("anim@heists@box_carry@")
-            TaskPlayAnim(ped, 'anim@heists@box_carry@', 'idle', 8.0, 8.0, -1, 50, 0, false, false, false)
-            SetTimeout(150, function()
-                AttachEntityToEntity(stretcherObject, ped, GetPedBoneIndex(ped, 28422), 0.0, -1.0, -1.0, 195.0, 180.0, 180.0, 90.0, false, false, true, false, 2, true)
-            end)
-            FreezeEntityPosition(stretcherObject, false)
-            isAttached = true
-        else
-            QBCore.Functions.Notify(Lang:t("error.stretcher_in_use"), "error")
-            isAttached = false
-        end
-    end
-end)
-
-AddEventHandler('onResourceStop', function(resource)
-    if resource == GetCurrentResourceName() then
-        if stretcherObject then
-            detachStretcher()
-            DeleteObject(stretcherObject)
-            ClearPedTasksImmediately(PlayerPedId())
-        end
-    end
-end)
-
--- Threads
+end
 
 CreateThread(function()
     while true do
-        setClosestStretcher()
+        SetClosestStretcher()
         Wait(1000)
     end
 end)
 
 CreateThread(function()
     while true do
-        local sleep = 1000
-        local ped = PlayerPedId()
-        local pos = GetEntityCoords(ped)
-        if stretcherObject then
-            local offsetCoords = GetOffsetFromEntityInWorldCoords(stretcherObject, 0, 0.85, 0)
-            local distance = #(pos - offsetCoords)
-            if distance <= 1.0 then
-                if not isAttached then
-                    sleep = 0
-                    DrawText3Ds(offsetCoords.x, offsetCoords.y, offsetCoords.z, Lang:t("general.push_stretcher_button"))
+        local PlayerPed = PlayerPedId()
+        local PlayerPos = GetEntityCoords(PlayerPed)
+        if StretcherObject ~= nil then
+            local OffsetCoords = GetOffsetFromEntityInWorldCoords(StretcherObject, 0, 0.85, 0)
+            local Distance = #(PlayerPos - OffsetCoords)
+
+            if Distance <= 1.0 then
+                if not IsAttached then
+                    DrawText3Ds(OffsetCoords.x, OffsetCoords.y, OffsetCoords.z, Lang:t("general.push_stretcher_button"))
                     if IsControlJustPressed(0, 51) then
-                        attachToStretcher()
-                        isAttached = true
-                        sleep = 100
+                        AttachToStretcher()
+                        IsAttached = true
                     end
                     if IsControlJustPressed(0, 74) then
-                        FreezeEntityPosition(stretcherObject, true)
-                        sleep = 100
+                        FreezeEntityPosition(StretcherObject, true)
                     end
                 else
-                    sleep = 0
-                    DrawText3Ds(offsetCoords.x, offsetCoords.y, offsetCoords.z, Lang:t("general.stop_pushing_stretcher_button"))
+                    DrawText3Ds(OffsetCoords.x, OffsetCoords.y, OffsetCoords.z, Lang:t("general.stop_pushing_stretcher_button"))
                     if IsControlJustPressed(0, 51) then
-                        detachStretcher()
-                        isAttached = false
-                        sleep = 100
+                        DetachStretcher()
+                        IsAttached = false
                     end
                 end
 
-                if not isLayingOnBed then
-                    if not isAttached then
-                        sleep = 0
-                        DrawText3Ds(offsetCoords.x, offsetCoords.y, offsetCoords.z + 0.2, Lang:t("general.lay_stretcher_button"))
+                if not IsLayingOnBed then
+                    if not IsAttached then
+                        DrawText3Ds(OffsetCoords.x, OffsetCoords.y, OffsetCoords.z + 0.2, Lang:t("general.lay_stretcher_button"))
                         if IsControlJustPressed(0, 47) or IsDisabledControlJustPressed(0, 47) then
                             LayOnStretcher()
-                            sleep = 100
                         end
                     end
                 end
-            elseif distance <= 2 then
-                if not isLayingOnBed then
-                    sleep = 0
-                    DrawText3Ds(offsetCoords.x, offsetCoords.y, offsetCoords.z, Lang:t("general.push_position_drawtext"))
+            elseif Distance <= 2 then
+                if not IsLayingOnBed then
+                    DrawText3Ds(OffsetCoords.x, OffsetCoords.y, OffsetCoords.z, Lang:t("general.push_position_drawtext"))
                 else
-                    if not isAttached then
-                        sleep = 0
-                        DrawText3Ds(offsetCoords.x, offsetCoords.y, offsetCoords.z + 0.2, Lang:t("general.get_off_stretcher_button"))
+                    if not IsAttached then
+                        DrawText3Ds(OffsetCoords.x, OffsetCoords.y, OffsetCoords.z + 0.2, Lang:t("general.get_off_stretcher_button"))
                         if IsControlJustPressed(0, 47) or IsDisabledControlJustPressed(0, 47) then
-                            getOffStretcher()
-                            sleep = 100
+                            GetOffStretcher()
                         end
                     end
                 end
             end
+        else
+            Wait(1000)
         end
-        Wait(sleep)
+
+        Wait(3)
     end
 end)
+
+function GetClosestPlayer()
+    local closestPlayers = QBCore.Functions.GetPlayersFromCoords()
+    local closestDistance = -1
+    local closestPlayer = -1
+    local coords = GetEntityCoords(PlayerPedId())
+
+    for i=1, #closestPlayers, 1 do
+        if closestPlayers[i] ~= PlayerId() then
+            local pos = GetEntityCoords(GetPlayerPed(closestPlayers[i]))
+            local distance = #(pos - coords)
+
+            if closestDistance == -1 or closestDistance > distance then
+                closestPlayer = closestPlayers[i]
+                closestDistance = distance
+            end
+        end
+	end
+
+	return closestPlayer, closestDistance
+end
+
+RegisterNetEvent('qb-radialmenu:client:RemoveStretcherFromArea', function(PlayerPos, BObject)
+    local Ped = PlayerPedId()
+    local Pos = GetEntityCoords(Ped)
+
+    if Pos ~= PlayerPos then
+        local Distance = #(Pos - PlayerPos)
+
+        if StretcherObject ~= nil or StretcherObject ~= 0 then
+            if StretcherObject == BObject then
+                if Distance < 10 then
+                    if IsEntityPlayingAnim(Ped, 'anim@heists@box_carry@', 'idle', false) then
+                        DetachStretcher()
+                    end
+
+                    if IsEntityPlayingAnim(Ped, "anim@gangops@morgue@table@", "ko_front", false) then
+                        local Coords = GetOffsetFromEntityInWorldCoords(Ped, 0.85, 0.0, 0)
+                        ClearPedTasks(Ped)
+                        DetachEntity(Ped, false, true)
+                        SetEntityCoords(Ped, Coords.x, Coords.y, Coords.z)
+                        IsLayingOnBed = false
+                    end
+                end
+            end
+        end
+    end
+end)
+
+function LayOnStretcher()
+    local inBedDicts = "anim@gangops@morgue@table@"
+    local inBedAnims = "ko_front"
+    local PlayerPed = PlayerPedId()
+    local PlayerPos = GetEntityCoords(PlayerPed)
+    local Object = GetClosestObjectOfType(PlayerPos.x, PlayerPos.y, PlayerPos.z, 3.0, `prop_ld_binbag_01`, false, false, false)
+    local player, distance = GetClosestPlayer()
+
+    if player == -1 then
+        LoadAnim(inBedDicts)
+        if Object ~= nil or Object ~= 0 then
+            TaskPlayAnim(PlayerPedId(), inBedDicts, inBedAnims, 8.0, 8.0, -1, 69, 1, false, false, false)
+            AttachEntityToEntity(PlayerPed, Object, 0, 0, 0.0, 1.0, 0.0, 0.0, 180.0, 0.0, false, false, false, false, 2, true)
+            IsLayingOnBed = true
+        end
+    else
+        if distance < 2.0 then
+            TriggerServerEvent('qb-radialmenu:Stretcher:BusyCheck', GetPlayerServerId(player), "lay")
+        else
+            LoadAnim(inBedDicts)
+            if Object ~= nil or Object ~= 0 then
+                TaskPlayAnim(PlayerPedId(), inBedDicts, inBedAnims, 8.0, 8.0, -1, 69, 1, false, false, false)
+                AttachEntityToEntity(PlayerPed, Object, 0, 0, 0.0, 1.6, 0.0, 0.0, 360.0, 0.0, false, false, false, false, 2, true)
+                IsLayingOnBed = true
+            end
+        end
+    end
+end
+
+RegisterNetEvent('qb-radialmenu:Stretcher:client:BusyCheck', function(OtherId, type)
+    local ped = PlayerPedId()
+    if type == "lay" then
+        LoadAnim("anim@gangops@morgue@table@")
+        IsEntityPlayingAnim(entity, animDict, animName, p4)
+        if IsEntityPlayingAnim(ped, "anim@gangops@morgue@table@", "ko_front", 3) then
+            TriggerServerEvent('qb-radialmenu:server:BusyResult', true, OtherId, type)
+        else
+            TriggerServerEvent('qb-radialmenu:server:BusyResult', false, OtherId, type)
+        end
+    else
+        LoadAnim('anim@heists@box_carry@')
+        if IsEntityPlayingAnim(ped, 'anim@heists@box_carry@', 'idle', 3) then
+            TriggerServerEvent('qb-radialmenu:server:BusyResult', true, OtherId, type)
+        else
+            TriggerServerEvent('qb-radialmenu:server:BusyResult', false, OtherId, type)
+        end
+    end
+end)
+
+RegisterNetEvent('qb-radialmenu:client:Result', function(IsBusy, type)
+    local inBedDicts = "anim@gangops@morgue@table@"
+    local inBedAnims = "ko_front"
+    local PlayerPed = PlayerPedId()
+    local PlayerPos = GetEntityCoords(PlayerPed)
+    local Object = GetClosestObjectOfType(PlayerPos.x, PlayerPos.y, PlayerPos.z, 3.0, `prop_ld_binbag_01`, false, false, false)
+    if type == "lay" then
+        if not IsBusy then
+            NetworkRequestControlOfEntity(StretcherObject)
+            LoadAnim(inBedDicts)
+            TaskPlayAnim(PlayerPedId(), inBedDicts, inBedAnims, 8.0, 8.0, -1, 69, 1, false, false, false)
+            AttachEntityToEntity(PlayerPed, Object, 0, 0, 0.0, 1.6, 0.0, 0.0, 360.0, 0.0, false, false, false, false, 2, true)
+            IsLayingOnBed = true
+        else
+            QBCore.Functions.Notify(Lang:t("error.stretcher_in_use"), "error")
+            IsLayingOnBed = false
+        end
+    else
+        if not IsBusy then
+            NetworkRequestControlOfEntity(StretcherObject)
+            LoadAnim("anim@heists@box_carry@")
+            TaskPlayAnim(PlayerPed, 'anim@heists@box_carry@', 'idle', 8.0, 8.0, -1, 50, 0, false, false, false)
+            SetTimeout(150, function()
+                AttachEntityToEntity(StretcherObject, PlayerPed, GetPedBoneIndex(PlayerPed, 28422), 0.0, -1.0, -1.0, 195.0, 180.0, 180.0, 90.0, false, false, true, false, 2, true)
+            end)
+            FreezeEntityPosition(StretcherObject, false)
+            IsAttached = true
+        else
+            QBCore.Functions.Notify(Lang:t("error.stretcher_in_use"), "error")
+            IsAttached = false
+        end
+    end
+end)
+
+function GetOffStretcher()
+    local PlayerPed = PlayerPedId()
+    local PlayerPos = GetEntityCoords(PlayerPed)
+    local Coords = GetOffsetFromEntityInWorldCoords(StretcherObject, 0.85, 0.0, 0)
+
+    ClearPedTasks(PlayerPed)
+    DetachEntity(PlayerPed, false, true)
+    SetEntityCoords(PlayerPed, Coords.x, Coords.y, Coords.z)
+    IsLayingOnBed = false
+end
+
+local DetachKeys = {157, 158, 160, 164, 165, 73, 36}
 
 CreateThread(function()
     while true do
-        local sleep = 1000
-        if isAttached then
-            sleep = 0
-            local ped = PlayerPedId()
-            for _, PressedKey in pairs(detachKeys) do
+        if IsAttached then
+            for _, PressedKey in pairs(DetachKeys) do
                 if IsControlJustPressed(0, PressedKey) or IsDisabledControlJustPressed(0, PressedKey) then
-                    detachStretcher()
-                    sleep = 100
+                    DetachStretcher()
                 end
             end
-            if IsPedShooting(ped) or IsPlayerFreeAiming(PlayerId()) or IsPedInMeleeCombat(ped) or IsEntityDead(ped) or IsPedRagdoll(ped) then
-                detachStretcher()
+
+            if IsPedShooting(PlayerPedId()) or IsPlayerFreeAiming(PlayerId()) or IsPedInMeleeCombat(PlayerPedId()) then
+                DetachStretcher()
             end
-        end
-        Wait(sleep)
+
+            if IsPedDeadOrDying(PlayerPedId(), false) then
+                DetachStretcher()
+            end
+
+            if IsPedRagdoll(PlayerPedId()) then
+                DetachStretcher()
+            end
+        else
+            Wait(1000)
+        end 
+        Wait(5)
     end
 end)
 
+function AttachToStretcher()
+    local PlayerPed = PlayerPedId()
+    local ClosestPlayer, distance = GetClosestPlayer()
+    local PlayerPed = PlayerPedId()
+    local PlayerPos = GetEntityCoords(PlayerPed)
+
+    if StretcherObject ~= nil then
+        if ClosestPlayer == -1 then
+            NetworkRequestControlOfEntity(StretcherObject)
+            LoadAnim("anim@heists@box_carry@")
+            TaskPlayAnim(PlayerPed, 'anim@heists@box_carry@', 'idle', 8.0, 8.0, -1, 50, 0, false, false, false)
+            SetTimeout(150, function()
+                AttachEntityToEntity(StretcherObject, PlayerPed, GetPedBoneIndex(PlayerPed, 28422), 0.0, -1.0, -0.50, 195.0, 180.0, 180.0, 90.0, false, false, true, false, 2, true)
+            end)
+            FreezeEntityPosition(StretcherObject, false)
+        else
+            if distance < 2.0 then
+                TriggerServerEvent('qb-radialmenu:Stretcher:BusyCheck', GetPlayerServerId(ClosestPlayer), "attach")
+            else
+                NetworkRequestControlOfEntity(StretcherObject)
+                LoadAnim("anim@heists@box_carry@")
+                TaskPlayAnim(PlayerPed, 'anim@heists@box_carry@', 'idle', 8.0, 8.0, -1, 50, 0, false, false, false)
+                SetTimeout(150, function()
+                    AttachEntityToEntity(StretcherObject, PlayerPed, GetPedBoneIndex(PlayerPed, 28422), 0.0, -1.0, -1.0, 195.0, 180.0, 180.0, 90.0, false, false, true, false, 2, true)
+                end)
+                FreezeEntityPosition(StretcherObject, false)
+            end
+        end
+    end
+end
+
+function DetachStretcher()
+    local PlayerPed = PlayerPedId()
+    DetachEntity(StretcherObject, false, true)
+    ClearPedTasksImmediately(PlayerPedId())
+    IsAttached = false
+end
+
 CreateThread(function()
     Wait(1000)
-    local ped = PlayerPedId()
-    local pos = GetEntityCoords(ped)
-    local object = GetClosestObjectOfType(pos.x, pos.y, pos.z, 5.0, `prop_ld_binbag_01`, false, false, false)
-    DeleteObject(object)
-    ClearPedTasksImmediately(ped)
+    local Ped = PlayerPedId()
+    local Pos = GetEntityCoords(Ped)
+    local Object = GetClosestObjectOfType(Pos.x, Pos.y, Pos.z, 5.0, `prop_ld_binbag_01`, false, false, false)
+    DeleteObject(Object)
+    ClearPedTasksImmediately(PlayerPedId())
 end)
+
+AddEventHandler('onResourceStop', function(resource)
+    if resource == GetCurrentResourceName() then
+        if StretcherObject ~= nil then
+            DetachStretcher()
+            DeleteObject(StretcherObject)
+            ClearPedTasksImmediately(PlayerPedId())
+        end
+    end
+end)
+
+function LoadAnim(dict)
+    while not HasAnimDictLoaded(dict) do
+        RequestAnimDict(dict)
+        Wait(0)
+    end
+end
+
+function LoadModel(model)
+    while not HasModelLoaded(model) do
+        RequestModel(model)
+        Wait(0)
+    end
+end

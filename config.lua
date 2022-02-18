@@ -37,7 +37,7 @@ Config.MenuItems = {
             }, {
                 id = 'interactions',
                 title = 'Interaction',
-                icon = 'exclamation-triangle',
+                icon = 'people-arrows',
                 items = {
                     {
                         id = 'handcuff',
@@ -59,13 +59,6 @@ Config.MenuItems = {
                         icon = 'car-side',
                         type = 'client',
                         event = 'police:client:SetPlayerOutVehicle',
-                        shouldClose = true
-                    }, {
-                        id = 'stealplayer',
-                        title = 'Rob',
-                        icon = 'mask',
-                        type = 'client',
-                        event = 'police:client:RobPlayer',
                         shouldClose = true
                     }, {
                         id = 'escort',
@@ -96,7 +89,7 @@ Config.MenuItems = {
     [2] = {
         id = 'general',
         title = 'General',
-        icon = 'list-alt',
+        icon = 'globe-americas',
         items = {
             {
                 id = 'house',
@@ -461,6 +454,44 @@ Config.MenuItems = {
             }
         }
     },
+    [4] = {
+        id = 'blips',
+        title = 'Blips',
+        icon = 'map-marker',
+        items = {
+            {
+                id = 'gasstation',
+                title = 'Gas Station',
+                icon = 'gas-pump',
+                type = 'client',
+                event = 'mrp:togglegas',
+                shouldClose = true
+            
+            }, {
+                id = 'barbershop',
+                title = 'Barber Shop',
+                icon = 'cut',
+                type = 'client',
+                event = 'mrp:togglebarber',
+                shouldClose = true
+            }, {
+                id = 'clothing',
+                title = 'Clothing Shop',
+                icon = 'tshirt',
+                type = 'client',
+                event = 'mrp:toggleclothing',
+                shouldClose = true
+            }
+        }
+    },
+    [5] = {
+        id = 'stealplayer',
+        title = 'Steal',
+        icon = 'shopping-bag',
+        type = 'client',
+        event = 'police:client:RobPlayer',
+        shouldClose = true,
+    },
 }
 
 Config.JobInteractions = {
@@ -489,7 +520,7 @@ Config.JobInteractions = {
         }, {
             id = 'emergencybutton2',
             title = 'Emergency button',
-            icon = 'bell',
+            icon = 'skull',
             type = 'client',
             event = 'police:client:SendPoliceEmergencyAlert',
             shouldClose = true
@@ -578,35 +609,35 @@ Config.JobInteractions = {
         {
             id = 'emergencybutton',
             title = 'Emergency button',
-            icon = 'bell',
+            icon = 'skull',
             type = 'client',
             event = 'police:client:SendPoliceEmergencyAlert',
             shouldClose = true
         }, {
+            id = 'searchplayer',
+            title = 'Search',
+            icon = 'search',
+            type = 'client',
+            event = 'police:client:SearchPlayer',
+            shouldClose = true
+        }, {
+            id = 'checkstatus',
+            title = 'Gsr Test',
+            icon = 'dna',
+            type = 'client',
+            event = 'police:client:CheckStatus',
+            shouldClose = true
+        }, {
             id = 'checkvehstatus',
             title = 'Check Tune Status',
-            icon = 'info-circle',
+            icon = 'car',
             type = 'client',
             event = 'qb-tunerchip:client:TuneStatus',
             shouldClose = true
         }, {
-            id = 'resethouse',
-            title = 'Reset house lock',
-            icon = 'key',
-            type = 'client',
-            event = 'qb-houses:client:ResetHouse',
-            shouldClose = true
-        }, {
-            id = 'takedriverlicense',
-            title = 'Revoke Drivers License',
-            icon = 'id-card',
-            type = 'client',
-            event = 'police:client:SeizeDriverLicense',
-            shouldClose = true
-        }, {
             id = 'policeinteraction',
-            title = 'Police Actions',
-            icon = 'tasks',
+            title = 'More Actions',
+            icon = 'ellipsis-h',
             items = {
                 {
                     id = 'statuscheck',
@@ -616,13 +647,6 @@ Config.JobInteractions = {
                     event = 'hospital:client:CheckStatus',
                     shouldClose = true
                 }, {
-                    id = 'checkstatus',
-                    title = 'Check status',
-                    icon = 'question',
-                    type = 'client',
-                    event = 'police:client:CheckStatus',
-                    shouldClose = true
-                }, {
                     id = 'escort',
                     title = 'Escort',
                     icon = 'user-friends',
@@ -630,18 +654,25 @@ Config.JobInteractions = {
                     event = 'police:client:EscortPlayer',
                     shouldClose = true
                 }, {
-                    id = 'searchplayer',
-                    title = 'Search',
-                    icon = 'search',
-                    type = 'client',
-                    event = 'police:client:SearchPlayer',
-                    shouldClose = true
-                }, {
                     id = 'jailplayer',
                     title = 'Jail',
                     icon = 'user-lock',
                     type = 'client',
                     event = 'police:client:JailPlayer',
+                    shouldClose = true
+                }, {
+                    id = 'takedriverlicense',
+                    title = 'Revoke Drivers License',
+                    icon = 'id-card',
+                    type = 'client',
+                    event = 'police:client:SeizeDriverLicense',
+                    shouldClose = true
+                }, {
+                    id = 'resethouse',
+                    title = 'Reset house lock',
+                    icon = 'key',
+                    type = 'client',
+                    event = 'qb-houses:client:ResetHouse',
                     shouldClose = true
                 }
             }
@@ -662,14 +693,14 @@ Config.JobInteractions = {
                     title = 'Gate',
                     icon = 'torii-gate',
                     type = 'client',
-                    event = 'police:client:spawnBarrier',
+                    event = 'police:client:spawnBarier',
                     shouldClose = false
                 }, {
                     id = 'spawnschotten',
                     title = 'Speed Limit Sign',
                     icon = 'sign',
                     type = 'client',
-                    event = 'police:client:spawnRoadSign',
+                    event = 'police:client:spawnSchotten',
                     shouldClose = false
                 }, {
                     id = 'spawntent',
@@ -751,14 +782,14 @@ Config.Commands = {
         Name = "Torso"
     },
     ["gloves"] = {
-        Func = function() ToggleClothing("gloves") end,
+        Func = function() ToggleClothing("Gloves") end,
         Sprite = "gloves",
         Desc = "Take your gloves off/on",
         Button = 2,
         Name = "Gloves"
     },
     ["visor"] = {
-        Func = function() ToggleProps("visor") end,
+        Func = function() ToggleProps("Visor") end,
         Sprite = "visor",
         Desc = "Toggle hat variation",
         Button = 3,
@@ -786,7 +817,7 @@ Config.Commands = {
         Name = "Vest"
     },
     ["hair"] = {
-        Func = function() ToggleClothing("hair") end,
+        Func = function() ToggleClothing("Hair") end,
         Sprite = "hair",
         Desc = "Put your hair up/down/in a bun/ponytail.",
         Button = 7,
@@ -844,7 +875,7 @@ Config.Commands = {
     }
 }
 
-local bags = {[40] = true, [41] = true, [44] = true, [45] = true}
+local Bags = {[40] = true, [41] = true, [44] = true, [45] = true}
 
 Config.ExtraCommands = {
     ["pants"] = {
@@ -883,14 +914,14 @@ Config.ExtraCommands = {
             local Bag = GetPedDrawableVariation(PlayerPedId(), 5)
             local BagOff = LastEquipped["Bagoff"]
             if LastEquipped["Bagoff"] then
-                if bags[BagOff.Drawable] then
+                if Bags[BagOff.Drawable] then
                     return "bagoff"
                 else
                     return "paraoff"
                 end
             end
             if Bag ~= 0 then
-                if bags[Bag] then
+                if Bags[Bag] then
                     return "bagoff"
                 else
                     return "paraoff"
@@ -905,3 +936,70 @@ Config.ExtraCommands = {
         OffsetY = 0.2
     }
 }
+
+Garages = {
+    ["alta"] = {
+        label = "Alta Street Parking",
+        blip = vector3(-297.69, -990.17, 30.47),
+        showBlip = true
+    },
+    ["pillboxgarage"] = {
+        label = "Pillbox Parking",
+        blip = vector3(219.11, -802.36, 30.75),
+        showBlip = true
+    },
+    ["pinkcage"] = {
+        label = "Pinkcage Motel Parking",
+        blip = vector3(277.09, -340.12, 44.31),
+        showBlip = true
+    },
+    ["beach"] = {
+        label = "Beach Parking",
+        blip = vector3(-1184.75, -1493.11, 3.77),
+        showBlip = true
+    },
+    ["vespucci"] = {
+        label = "Vespucci Parking",
+        blip = vector3(-1145.16, -745.46, 19.06),
+        showBlip = true
+    },
+    ["senora"] = {
+        label = "Senora Parking",
+        blip = vector3(1929.88, 3260.73, 45.12),
+        showBlip = true
+    },
+    ["paleto"] = {
+        label = "Paleto Parking",
+        blip = vector3(76.12, 6363.28, 31.23),
+        showBlip = true
+    },
+}
+
+HouseGarages = {}
+
+GangGarages = {
+    ["cartel"] = {
+        label = "Cartel",
+        -- takeVehicle = vector3(1407.18, 1118.04, 114.84),
+        -- spawnPoint = vector4(1407.18, 1118.04, 114.84, 88.34),
+        -- putVehicle = vector3(1407.18, 1118.04, 114.84),
+        job = "cartel"
+    },
+}
+
+JobGarages = {
+    ["police"] = {
+        label = "Police",
+        job = "police"
+    },
+}
+
+Depots = {
+    ["hayesdepot"] = {
+        label = "Hayes Depot",
+        takeVehicle = vector4(491.0, -1314.69, 29.25, 304.5),
+        showBlip = true
+    }
+}
+
+AutoRespawn = true --True == auto respawn cars that are outside into your garage on script restart, false == does not put them into your garage and players have to go to the impound

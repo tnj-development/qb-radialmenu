@@ -13,9 +13,9 @@ function RadialMenu(params) {
     self.onClick   = params.onClick || null;
     self.menuItems = params.menuItems ? params.menuItems : [{id: 'one', title: 'One'}, {id: 'two', title: 'Two'}];
 
-    self.radius      = 55;
-    self.innerRadius = 18;
-    self.sectorSpace = 3.5;
+    self.radius      = 57;
+    self.innerRadius = 20;
+    self.sectorSpace = 1;
     self.sectorCount = Math.max(self.menuItems.length, MIN_SECTORS);
     self.closeOnClick = params.closeOnClick !== undefined ? !!params.closeOnClick : false;
 
@@ -255,7 +255,7 @@ RadialMenu.prototype.createMenu = function (classValue, levelItems, nested) {
     if (nested) {
         self.createCenter(svg, 'Close', 'arrow-left', 10);
     } else {
-        self.createCenter(svg, 'Close', 'times-circle', 10);
+        self.createCenter(svg, 'Close', 'times', 10);
     }
 
     svg.addEventListener('mousedown', function (event) {
