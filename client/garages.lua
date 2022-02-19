@@ -15,7 +15,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(-297.82, -990.49, 31.08), 6, 3, {
             name="alta",
             heading=340,
-            debugPoly=true,
+            debugPoly=false,
             minZ=30.08,
             maxZ=33.08,
             spawner = vector4(-297.69, -990.17, 30.47, 341.13)
@@ -26,7 +26,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(-301.4, -989.25, 31.08) , 6, 3, {
             name="alta",
             heading=340,
-            debugPoly=true,
+            debugPoly=false,
             minZ=30.08,
             maxZ=33.08
         }),
@@ -36,7 +36,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(-304.93, -988.08, 31.08), 6, 3, {
             name="alta",
             heading=340,
-            debugPoly=true,
+            debugPoly=false,
             minZ=30.08,
             maxZ=33.08
         }),
@@ -46,7 +46,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(-308.36, -986.7, 30.47), 6, 3, {
             name="alta",
             heading=340,
-            debugPoly=true,
+            debugPoly=false,
             minZ=30.08,
             maxZ=33.08
         }),
@@ -57,7 +57,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(222.03, -804.21, 29.0), 6, 3, {
             name="pillboxgarage",
             heading=248.32,
-            debugPoly=true,
+            debugPoly=false,
             minZ=29.08,
             maxZ=33.08
         }),
@@ -67,7 +67,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(216.05, -801.79, 30.19), 6, 3, {
             name="pillboxgarage",
             heading=248.32,
-            debugPoly=true,
+            debugPoly=false,
             minZ=29.08,
             maxZ=33.08
         }),
@@ -77,7 +77,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(217.59, -799.07, 30.17), 6, 3, {
             name="pillboxgarage",
             heading=248.32,
-            debugPoly=true,
+            debugPoly=false,
             minZ=29.08,
             maxZ=33.08
         }),
@@ -87,7 +87,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(222.99, -801.23, 30.06), 6, 3, {
             name="pillboxgarage",
             heading=248.32,
-            debugPoly=true,
+            debugPoly=false,
             minZ=29.08,
             maxZ=33.08
         }),
@@ -97,7 +97,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(277.37, -340.22, 44.31), 6, 3, {
             name="pinkcage",
             heading=69.83,
-            debugPoly=true,
+            debugPoly=false,
             minZ=43.31,
             maxZ=47.31
         }),
@@ -107,7 +107,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(278.65, -336.76, 44.31), 6, 3, {
             name="pinkcage",
             heading=69.83,
-            debugPoly=true,
+            debugPoly=false,
             minZ=43.31,
             maxZ=47.31
         }),
@@ -117,7 +117,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(284.66, -338.95, 44.31), 6, 3, {
             name="pinkcage",
             heading=69.83,
-            debugPoly=true,
+            debugPoly=false,
             minZ=43.31,
             maxZ=47.31
         }),
@@ -127,7 +127,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(283.21, -342.36, 44.31), 6, 3, {
             name="pinkcage",
             heading=69.83,
-            debugPoly=true,
+            debugPoly=false,
             minZ=43.31,
             maxZ=47.31
         }),
@@ -137,7 +137,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(-1184.75, -1493.11, 3.77), 6, 3, {
             name="beach",
             heading=122.74,
-            debugPoly=true,
+            debugPoly=false,
             minZ=2.31,
             maxZ=6.31
         }),
@@ -147,7 +147,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(-1186.23, -1490.28, 3.77), 6, 3, {
             name="beach",
             heading=122.74,
-            debugPoly=true,
+            debugPoly=false,
             minZ=2.31,
             maxZ=6.31
         }),
@@ -157,7 +157,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(-1179.05, -1489.36, 3.77), 6, 3, {
             name="beach",
             heading=122.74,
-            debugPoly=true,
+            debugPoly=false,
             minZ=2.31,
             maxZ=6.31
         }),
@@ -167,7 +167,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(-1180.99, -1486.57, 3.77), 6, 3, {
             name="beach",
             heading=122.74,
-            debugPoly=true,
+            debugPoly=false,
             minZ=2.31,
             maxZ=6.31
         }),
@@ -178,7 +178,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(-1145.6, -745.62, 19.05), 6, 3, {
             name="vespucci",
             heading=285.52,
-            debugPoly=true,
+            debugPoly=false,
             minZ=18.31,
             maxZ=22.31
         }),
@@ -188,7 +188,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(-1143.44, -748.7, 18.89), 6, 3, {
             name="vespucci",
             heading=285.52,
-            debugPoly=true,
+            debugPoly=false,
             minZ=18.31,
             maxZ=22.31
         }),
@@ -198,7 +198,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(-1139.62, -743.6, 19.27), 6, 3, {
             name="vespucci",
             heading=285.52,
-            debugPoly=true,
+            debugPoly=false,
             minZ=18.31,
             maxZ=22.31
         }),
@@ -208,7 +208,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(-1136.96, -746.47, 19.14), 6, 3, {
             name="vespucci",
             heading=285.52,
-            debugPoly=true,
+            debugPoly=false,
             minZ=18.31,
             maxZ=22.31
         }),
@@ -218,7 +218,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(1925.44, 3258.99, 45.11), 6, 4, {
             name="senora",
             heading=205.49,
-            debugPoly=true,
+            debugPoly=false,
             minZ=44.31,
             maxZ=47.31
         }),
@@ -228,7 +228,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(1929.53, 3260.94, 45.12), 6, 4, {
             name="senora",
             heading=208.31,
-            debugPoly=true,
+            debugPoly=false,
             minZ=44.31,
             maxZ=47.31
         }),
@@ -238,7 +238,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(1934.02, 3263.76, 45.12), 6,5, {
             name="senora",
             heading=211.21,
-            debugPoly=true,
+            debugPoly=false,
             minZ=44.31,
             maxZ=47.31
         }),
@@ -248,7 +248,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(1938.89, 3266.78, 45.11), 6,5, {
             name="senora",
             heading=214.63,
-            debugPoly=true,
+            debugPoly=false,
             minZ=44.31,
             maxZ=47.31
         }),
@@ -258,7 +258,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(70.3, 6361.11, 30.62), 7, 3.3, {
             name="paleto",
             heading=12.64,
-            debugPoly=true,
+            debugPoly=false,
             minZ=29.31,
             maxZ=33.31
         }),
@@ -268,7 +268,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(73.77, 6362.85, 30.62), 7, 3.3, {
             name="paleto",
             heading=12.64,
-            debugPoly=true,
+            debugPoly=false,
             minZ=29.31,
             maxZ=33.31
         }),
@@ -278,7 +278,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(77.42, 6364.43, 30.62), 7, 3.3, {
             name="paleto",
             heading=12.64,
-            debugPoly=true,
+            debugPoly=false,
             minZ=29.31,
             maxZ=33.31
         }),
@@ -288,7 +288,7 @@ Garagez = {
         ["zone"] = BoxZone:Create(vector3(80.94, 6365.83, 30.62), 7, 3.3, {
             name="paleto",
             heading=12.64,
-            debugPoly=true,
+            debugPoly=false,
             minZ=29.31,
             maxZ=33.31
         }),
@@ -300,7 +300,7 @@ GangGaragez = {
         ["zone"] = BoxZone:Create(vector3(1407.18, 1118.04, 113.84), 5, 3, {
             name="cartel",
             heading=88.34,
-            debugPoly=true,
+            debugPoly=false,
             minZ=113.84,
             maxZ=116.84,
         }),
@@ -313,7 +313,7 @@ JobGaragez = {
         ["zone"] = BoxZone:Create(vector3(462.57, -1019.61, 27.09), 5, 3, {
             name="police",
             heading=89.25,
-            debugPoly=true,
+            debugPoly=false,
             minZ=27.09,
             maxZ=30.09,
         }),
@@ -325,7 +325,6 @@ Depotz = {
     {
 
         --[[
-
         Depots = {
             ["hayesdepot"] = {
                 label = "Hayes Depot",
@@ -337,7 +336,7 @@ Depotz = {
         ["zone"] = BoxZone:Create(vector3(491.41, -1314.45, 28.65), 5, 3, {
             name="hayesdepot",
             heading=307.69,
-            debugPoly=true,
+            debugPoly=false,
             minZ=27.08,
             maxZ=30.08,
         }),
