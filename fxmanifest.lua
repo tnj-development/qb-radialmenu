@@ -9,6 +9,7 @@ ui_page 'html/index.html'
 
 shared_scripts {
     'config.lua',
+    'garageconfig.lua',
     '@qb-core/shared/locale.lua',
     'locales/en.lua' -- Change this to your preferred language
 }
