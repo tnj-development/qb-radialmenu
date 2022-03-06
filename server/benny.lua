@@ -1,8 +1,6 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local Pay = true
 local Price = 200
-local Pay = true
-local Price = 200
 
 print([[
      ____.              ___________.__                _____   
